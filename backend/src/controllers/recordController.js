@@ -4,12 +4,7 @@ const path = require("path");
 const router = express.Router();
 
 router.get("/pixel.png", (req, res, next) => {
-  let pixel_file = path.join(
-    path.dirname(path.dirname(__dirname)),
-    "public",
-    "pixel.png"
-  );
-
+  let pixel_file = path.resolve('./public/pixel.png')
   recordService.createRecord(req.query)
     .then(
       _ => {

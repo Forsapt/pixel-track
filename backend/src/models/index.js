@@ -37,6 +37,8 @@ tracker.hasMany(record, {
   onDelete: "CASCADE",
 });
 
-// sequelize.sync({force: true});
+if(process.env.ACTION === "create_database"){
+  sequelize.sync({force: true});
+}
 
 module.exports = sequelize;

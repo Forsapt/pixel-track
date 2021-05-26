@@ -3,17 +3,14 @@ const bodyParser = require("body-parser");
 const applyRoutes = require("./controllers");
 const passportSetup = require("./passport-setup");
 const path = require("path");
+
 const config = require("./config");
 
+
 const app = express();
-app.use(express.static('public'));
+app.use(express.static(path.resolve('./public/')));
 app.get('/loginRedirect', (req, res, next) => {
-  let index_file = path.join(
-    path.dirname(__dirname),
-    "public",
-    "index.html"
-  );
-  res.sendFile(index_file)
+  res.sendFile(path.resolve('./public/index.html'))
 })
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
