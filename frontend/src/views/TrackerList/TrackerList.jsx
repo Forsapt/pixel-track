@@ -118,6 +118,9 @@ function TrackerList() {
   if (path[path.length-1] === '/'){
     path = path.substring(0, path.length-1)
   }
+  if(path == ""){
+    path = '/'
+  }
   let img = new Image();
   img.src = "http://"+host+"/api/record/pixel.png?path="+path+"&trackerId="+trackerId+"&r="+r
   document.body.appendChild(img);
