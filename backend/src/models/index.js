@@ -1,12 +1,16 @@
-const { Sequelize } = require("sequelize");
+const {Sequelize} = require("sequelize");
 const config = require("../config");
 
 const sequelize = new Sequelize(
   config.database_url,
   {
-    dialect: "postgres",
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+      ssl: config.database_ssl
+    }
   }
-  )
+)
 
 const modelDefiners = [
   require("./user"),
@@ -19,25 +23,25 @@ for (const modelDefiner of modelDefiners) {
   modelDefiner(sequelize);
 }
 
-let { tracker, record, user, refreshToken} = sequelize.models;
+let {tracker, record, user, refreshToken} = sequelize.models;
 
 user.hasMany(tracker, {
-  foreignKey: { allowNull: false },
+  foreignKey: {allowNull: false},
   onDelete: "CASCADE",
 });
 
 
 user.hasMany(refreshToken, {
-  foreignKey: { allowNull: false },
+  foreignKey: {allowNull: false},
   onDelete: "CASCADE",
 });
 
 tracker.hasMany(record, {
-  foreignKey: { allowNull: false },
+  foreignKey: {allowNull: false},
   onDelete: "CASCADE",
 });
 
-if(process.env.ACTION === "create_database"){
+if (process.env.ACTION === "create_database") {
   sequelize.sync({force: true});
 }
 
