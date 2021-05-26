@@ -7,7 +7,10 @@ const sequelize = new Sequelize(
     dialect: 'postgres',
     protocol: 'postgres',
     dialectOptions: {
-      ssl: config.database_ssl
+      ssl: {
+        require: config.database_ssl,
+        rejectUnauthorized: false
+      }
     }
   }
 )
