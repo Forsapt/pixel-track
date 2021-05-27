@@ -56,13 +56,28 @@ function Tracker({match}) {
     )
   }, [match.params.id])
 
-  function inspectHandler(path, filter=true) {
+  function inspectHandler(path, filter = true) {
     refChart.current.scrollIntoView()
     let data = []
-    if (filter){
+    if (filter) {
       data = trackerData.byDays.filter(el => el.path === path);
-    }else{
-      data = trackerData.byDays;
+    } else {
+      data = [];
+      for (let i = 0; i < 31; i++) {
+        let date = moment().subtract(i, "days").format('DD-MM-YYYY')
+        let record = trackerData.byDays.filter(el => moment(el.day).format('DD-MM-YYYY') === date)
+        if (record.length === 0) {
+          continue;
+        }
+        let sum = 0;
+        record.forEach(el => {
+          sum += Number(el.viewcount)
+        })
+        data.push({
+          day: moment().subtract(i, "days").format(),
+          viewcount: sum
+        })
+      }
     }
     for (let i = 0; i < 31; i++) {
       let date = moment().subtract(i, "days").format('DD-MM-YYYY')
@@ -75,15 +90,14 @@ function Tracker({match}) {
         viewcount: 0
       })
     }
-    data.sort((a,b) => moment(a.day) > moment(b.day))
-    console.log(data);
+    data.sort((a, b) => moment(a.day) > moment(b.day))
     setData({
       labels: data.map(el => {
         return moment(el.day).format('DD-MM-YYYY')
       }),
       datasets: [
         {
-          label: filter?`Path: ${path}`:'Last month',
+          label: filter ? `Path: ${path}` : 'Last month',
           data: data.map(el => el.viewcount),
           fill: false,
           backgroundColor: 'rgb(132, 99, 255)',
@@ -135,7 +149,7 @@ function Tracker({match}) {
               )
             }}
           />
-          <Button onClick={()=>inspectHandler('', false)}>Last month</Button>
+          <Button onClick={() => inspectHandler('', false)}>Last month</Button>
           <div ref={refChart}>
             <Line data={data} options={options}/>
           </div>
