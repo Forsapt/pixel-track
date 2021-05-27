@@ -73,9 +73,9 @@ passport.use(
   new JwtStrategy(opts, function (jwt_payload, done) {
     let timespan = new Date() / 1000 - jwt_payload.iat;
     if (timespan > config.jwt_ttl) {
-      done(null, false, {message: 'Token expired'})
+      return done(null, false, {message: 'Token expired'})
     }
-    done(null, {id: jwt_payload.id})
+    return done(null, {id: jwt_payload.id})
   })
 );
 
@@ -105,12 +105,11 @@ module.exports = function (app) {
       try{
         let oldToken = await RefreshToken.findOne({where: {token: req.params.refreshToken}})
         if (oldToken === null || oldToken === undefined) {
-          res.status(400).send("Invalid token")
-          return
+          return res.status(400).send("Invalid token")
+
         }
         if (oldToken.dataValues === null || oldToken.dataValues === undefined) {
-          res.status(400).send("Invalid token")
-          return
+          return res.status(400).send("Invalid token")
         }
         let id = oldToken.dataValues.userId
         await oldToken.destroy()
@@ -118,7 +117,7 @@ module.exports = function (app) {
         let refreshToken = await generateToken()
         await RefreshToken.create({userId: id, token: refreshToken})
         refreshToken = refreshToken.toString('hex')
-        res.json({
+        return res.json({
           accessToken,
           refreshToken
         });
