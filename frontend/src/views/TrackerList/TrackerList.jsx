@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
-import {Button, Form, Input, Layout, message, Modal, Space, Table, Typography} from 'antd';
+import {Button, Dropdown, Form, Input, Layout, Menu, message, Modal, Space, Table, Typography} from 'antd';
+import {DeleteOutlined, CodeOutlined, EditOutlined, EyeOutlined} from '@ant-design/icons'
 import {Header} from "../../components";
 import {tracker} from "../../api";
 import {Link} from "react-router-dom";
@@ -13,6 +14,8 @@ function TrackerList() {
   let [currentTracker, setCurrentTracker] = useState({url: '', name: ''})
   let [modalVisible, setModalVisible] = useState(false)
   let [codeVisible, setCodeVisible] = useState(false)
+  let [deleteVisible, setDeleteVisible] = useState(false)
+  let [deleteId, setDeleteId] = useState(-1)
   let [code, setCode] = useState(false)
   let [mode, setMode] = useState('')
   useEffect(() => {
@@ -131,6 +134,43 @@ function TrackerList() {
     setCodeVisible(true)
   }
 
+  const menu = (id) => {
+    return (
+      <Menu>
+        <Menu.Item
+          icon={<EyeOutlined />}
+        >
+          <Link to={'/trackers/' + id}>View</Link>
+        </Menu.Item>
+        <Menu.Item
+          icon={<CodeOutlined />}
+          onClick={() => {showCodeHandler(id)}}>
+          Get code
+        </Menu.Item>
+        <Menu.Item
+          icon={<EditOutlined />}
+          onClick={() => {
+          setMode('edit')
+          setModalVisible(true)
+          setCurrentTracker(
+            data.filter(el => el.id === id)[0]
+          )
+        }}>
+          Edit
+        </Menu.Item>
+        <Menu.Item
+          icon={<DeleteOutlined />}
+          danger
+          onClick={() => {
+          setDeleteVisible(true)
+          setDeleteId(id)
+        }}>
+          Delete
+        </Menu.Item>
+      </Menu>
+    )
+  };
+
   const columns = [
     {
       title: 'Name',
@@ -148,24 +188,9 @@ function TrackerList() {
       key: 'id',
       width: 100,
       render: id => <>
-        <Space>
-          <Button type={'danger'} onClick={() => {
-            deleteTrackerHandler(id)
-          }}>Delete</Button>
-          <Button type={'primary'} onClick={() => {
-            setMode('edit')
-            setModalVisible(true)
-            setCurrentTracker(
-              data.filter(el => el.id === id)[0]
-            )
-          }}>
-            Edit
-          </Button>
-          <Button type={'primary'} onClick={() => {showCodeHandler(id)}}>
-            Get code
-          </Button>
-          <Link to={'/trackers/' + id}><Button type={'primary'}>View</Button></Link>
-        </Space>
+        <Dropdown overlay={menu(id)} placement="bottomLeft">
+          <Button>Action</Button>
+        </Dropdown>
       </>,
     }
   ];
@@ -231,6 +256,20 @@ function TrackerList() {
         onCancel={() => {setCodeVisible(false)}}
       >
         <Input.TextArea value={code}/>
+      </Modal>
+      <Modal
+        title="Delete"
+        visible={deleteVisible}
+        onOk={() => {
+          setDeleteVisible(false)
+          deleteTrackerHandler(deleteId)
+        }}
+        onCancel={() => {setDeleteVisible(false)}}
+        okText="Delete"
+        cancelText="Cancel"
+        okButtonProps={{ type: 'danger' }}
+      >
+        <p>Are you sure you want to delete the tracker?</p>
       </Modal>
     </>
   )
