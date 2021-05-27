@@ -36,10 +36,12 @@ async function editTracker(params) {
   return tracker.data
 }
 
-export default {
+const tracker = {
   getTrackers,
   deleteTracker,
   addTracker,
   editTracker,
   getTracker
 }
+
+export default tracker

@@ -2,7 +2,7 @@ import {Mutex} from 'async-mutex';
 
 const mutex = new Mutex();
 
-export default (instance) => {
+const jwt = (instance) => {
   instance.interceptors.request.use(function (config) {
     let accessToken = localStorage.getItem("accessToken");
     config.headers = {
@@ -37,3 +37,5 @@ export default (instance) => {
       return Promise.reject(err)
     })
 }
+
+export default jwt

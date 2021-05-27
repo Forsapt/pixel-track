@@ -2,24 +2,12 @@ import React, {useEffect, useRef, useState} from 'react'
 import {Button, Divider, Layout, List, Typography} from 'antd';
 import {Header} from "../../components";
 import {tracker} from "../../api";
-import { Line  } from 'react-chartjs-2';
+import {Line} from 'react-chartjs-2';
 import {Link} from "react-router-dom";
+import moment from "moment";
 
 const {Footer, Content} = Layout;
 const {Text, Title} = Typography;
-
-const data = {
-  labels: ['1', '2', '3', '4', '5', '6'],
-  datasets: [
-    {
-      label: '# of Votes',
-      data: [12, 19, 3, 5, 2, 3],
-      fill: false,
-      backgroundColor: 'rgb(132, 99, 255)',
-      borderColor: 'rgba(132, 99, 255, 0.5)',
-    },
-  ],
-};
 
 const options = {
   scales: {
@@ -54,7 +42,8 @@ function Tracker({match}) {
     tracker.getTracker(match.params.id)
       .then(
         res => {
-          console.log(res);
+          trackerData = res;
+          inspectHandler('', false)
           setTrackerData(res)
           setLoading(false)
         }
@@ -65,19 +54,37 @@ function Tracker({match}) {
         window.location.href = '/trackers'
       }
     )
-  }, [])
+  }, [match.params.id])
 
-  function inspectHandler(path) {
+  function inspectHandler(path, filter=true) {
     refChart.current.scrollIntoView()
+    let data = []
+    if (filter){
+      data = trackerData.byDays.filter(el => el.path === path);
+    }else{
+      data = trackerData.byDays;
+    }
+    for (let i = 0; i < 31; i++) {
+      let date = moment().subtract(i, "days").format('DD-MM-YYYY')
+      let record = data.find(el => moment(el.day).format('DD-MM-YYYY') === date)
+      if (record !== null && record !== undefined) {
+        continue;
+      }
+      data.push({
+        day: moment().subtract(i, "days").format(),
+        viewcount: 0
+      })
+    }
+    data.sort((a,b) => moment(a.day) > moment(b.day))
+    console.log(data);
     setData({
-      labels: trackerData.byDays.filter(el => el.path === path).map(el => {
-        let date = new Date(el.day)
-        return `${date.getDay()}.${date.getMonth()}.${date.getFullYear()}`
+      labels: data.map(el => {
+        return moment(el.day).format('DD-MM-YYYY')
       }),
       datasets: [
         {
-          label: "Path: " + path,
-          data: trackerData.byDays.filter(el => el.path === path).map(el => el.viewcount),
+          label: filter?`Path: ${path}`:'Last month',
+          data: data.map(el => el.viewcount),
           fill: false,
           backgroundColor: 'rgb(132, 99, 255)',
           borderColor: 'rgba(132, 99, 255, 0.5)',
@@ -109,8 +116,11 @@ function Tracker({match}) {
               return (
                 <>
                   <List.Item
+                    key={item.path}
                     actions={[
-                      <Button onClick={() => {inspectHandler(item.path)}}>
+                      <Button onClick={() => {
+                        inspectHandler(item.path)
+                      }}>
                         Inspect
                       </Button>
                     ]}
@@ -125,9 +135,9 @@ function Tracker({match}) {
               )
             }}
           />
-          <div  ref={refChart}>
-            <Line  data={data} options={options} height={70}/>
-
+          <Button onClick={()=>inspectHandler('', false)}>Last month</Button>
+          <div ref={refChart}>
+            <Line data={data} options={options}/>
           </div>
 
         </Content>

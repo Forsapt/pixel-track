@@ -11,15 +11,18 @@ async function getTrackerById(id) {
   if (tracker === null || tracker === undefined) {
     throw {message: "Tracker not found"}
   }
+  let date = new Date();
+  date.setDate(date.getDate()-31);
   const statistics = await sequelize.query(
     `SELECT "path", count("path") as viewcount
          FROM records
-         WHERE "trackerId"=(?)
+         WHERE "trackerId"=(?) AND "createdAt" > (?)
          GROUP by path
          ORDER BY viewcount DESC`,
     {
       replacements: [
-        id
+        id,
+        date
       ],
       type: QueryTypes.SELECT
     }
@@ -28,13 +31,14 @@ async function getTrackerById(id) {
   let byDays = await sequelize.query(
     `SELECT "path", count("path") as viewcount, DATE_TRUNC('day', "createdAt") as "day"
          FROM records
-         WHERE "trackerId"=(?)
+         WHERE "trackerId"=(?) AND "createdAt" > (?)
          GROUP by path, DATE_TRUNC('day', "createdAt")
          ORDER BY DATE_TRUNC('day', "createdAt")`
     ,
     {
       replacements: [
-        id
+        id,
+        date
       ],
       type: QueryTypes.SELECT
     }

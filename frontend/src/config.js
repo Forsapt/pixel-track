@@ -1,3 +1,5 @@
-export default {
+const config = {
   apiUrl: '/api/'
 }
+
+export default config

@@ -106,6 +106,9 @@ module.exports = function (app) {
       if (oldToken === null || oldToken === undefined) {
         res.status(400).send("Invalid token")
       }
+      if (oldToken.dataValues === null || oldToken.dataValues === undefined) {
+        res.status(400).send("Invalid token")
+      }
       let id = oldToken.dataValues.userId
       await oldToken.destroy()
       let accessToken = jwt.sign({id: id}, config.jwt_secret)

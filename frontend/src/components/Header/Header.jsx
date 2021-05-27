@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react"
-import {Button, Layout, Typography} from "antd";
+import {Button, Layout} from "antd";
 import {Logo} from "../";
 import {user} from '../../api'
+import {Username} from "./styled";
 
 const AntdHeader = Layout.Header;
-const {Text} = Typography;
 
 function Header() {
   let [username, setUsername] = useState('Loading...')
@@ -30,9 +30,9 @@ function Header() {
             color: '#fff'
           }}
         >
-          <span style={{marginRight: '10px'}}>
+          <Username>
             {username}
-          </span>
+          </Username>
           <Button
             onClick={() => {
               localStorage.removeItem('accessToken')

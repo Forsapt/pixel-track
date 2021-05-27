@@ -6,6 +6,8 @@ async function getUser() {
 
 }
 
-export default {
+const user = {
   getUser
 }
+
+export default user

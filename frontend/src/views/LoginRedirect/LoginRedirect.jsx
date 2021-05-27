@@ -1,48 +1,9 @@
 import React from 'react'
-import {Button, Layout, Space, Typography} from 'antd';
+import {Layout, Typography} from 'antd';
 import {Redirect} from "react-router-dom";
 
 const {Header, Footer, Content} = Layout;
 const {Text} = Typography;
-
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: 'Action',
-    dataIndex: 'id',
-    key: 'id',
-    width: 100,
-    render: id => <>
-      <Space>
-        <Button type={'danger'} onClick={() => console.log(`Delete ${id}`)}>Delete</Button>
-        <Button type={'primary'} onClick={() => console.log(`View ${id}`)}>View</Button>
-      </Space>
-    </>,
-  }
-];
-
-let data = [
-  {
-    id: '1',
-    name: 'Tracker 1',
-  },
-  {
-    id: '2',
-    name: 'Tracker 2',
-  },
-  {
-    id: '3',
-    name: 'Tracker 3',
-  },
-];
-
-data = data.map(item => {
-  return {...item, key: item.id}
-})
 
 function LoginRedirect() {
   let url = window.location.href;

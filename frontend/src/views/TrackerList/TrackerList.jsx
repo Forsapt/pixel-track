@@ -202,7 +202,7 @@ function TrackerList() {
         visible={modalVisible}
         title="Title"
         onOk={onOkHandler}
-        onCancel={onOkHandler}
+        onCancel={onCancelHandler}
       >
         <Form>
           <Form.Item
