@@ -102,23 +102,29 @@ module.exports = function (app) {
   app.get(
     "/api/auth/renew/:refreshToken",
     async function (req, res) {
-      let oldToken = await RefreshToken.findOne({where: {token: req.params.refreshToken}})
-      if (oldToken === null || oldToken === undefined) {
-        res.status(400).send("Invalid token")
+      try{
+        let oldToken = await RefreshToken.findOne({where: {token: req.params.refreshToken}})
+        if (oldToken === null || oldToken === undefined) {
+          res.status(400).send("Invalid token")
+          return
+        }
+        if (oldToken.dataValues === null || oldToken.dataValues === undefined) {
+          res.status(400).send("Invalid token")
+          return
+        }
+        let id = oldToken.dataValues.userId
+        await oldToken.destroy()
+        let accessToken = jwt.sign({id: id}, config.jwt_secret)
+        let refreshToken = await generateToken()
+        await RefreshToken.create({userId: id, token: refreshToken})
+        refreshToken = refreshToken.toString('hex')
+        res.json({
+          accessToken,
+          refreshToken
+        });
+      }catch (e) {
+        res.status(500).send("Internal error")
       }
-      if (oldToken.dataValues === null || oldToken.dataValues === undefined) {
-        res.status(400).send("Invalid token")
-      }
-      let id = oldToken.dataValues.userId
-      await oldToken.destroy()
-      let accessToken = jwt.sign({id: id}, config.jwt_secret)
-      let refreshToken = await generateToken()
-      await RefreshToken.create({userId: id, token: refreshToken})
-      refreshToken = refreshToken.toString('hex')
-      res.json({
-        accessToken,
-        refreshToken
-      });
     }
   );
 };
