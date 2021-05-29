@@ -125,7 +125,7 @@ function TrackerList() {
     path = '/'
   }
   let img = new Image();
-  img.src = "http://"+host+"/api/record/pixel.png?path="+path+"&trackerId="+trackerId+"&r="+r
+  img.src = "http://"+host+"/api/record/" + r + ".png?path="+path+"&trackerId="+trackerId+"&r="+r
   document.body.appendChild(img);
 </script>
 `
