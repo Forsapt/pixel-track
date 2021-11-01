@@ -9,11 +9,10 @@ const config = require("./config");
 const {userService} = require('./services')
 
 async function generateToken() {
-  // return require('crypto').randomBytes(32)
-  var result = [];
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var charactersLength = characters.length;
-  for (var i = 0; i < 32; i++) {
+  let result = [];
+  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let charactersLength = characters.length;
+  for (let i = 0; i < 32; i++) {
     result.push(characters.charAt(Math.floor(Math.random() *
       charactersLength)));
   }
@@ -36,31 +35,25 @@ passport.use(
       clientSecret: config.google_client_secret,
       callbackURL: "/auth/google/callback",
     },
-    function (accessToken, refreshToken, profile, done) {
+    async function (accessToken, refreshToken, profile, done) {
       let username = profile._json.name;
       let email = profile._json.email;
       let googleId = profile.id;
-      userService.getUserByGoogleId(googleId).then(
-        user => {
-          if (user == null) {
-            userService.createUser(
-              {
-                username,
-                email,
-                googleId
-              }
-            ).then(
-              user => done(null, user)
-            ).catch(
-              err => done(err)
-            )
-          } else {
-            done(null, user)
-          }
+      try {
+        let user = await userService.getUserByGoogleId(googleId)
+        if (user == null) {
+          user = await userService.createUser(
+            {
+              username,
+              email,
+              googleId
+            }
+          )
         }
-      ).catch(
-        err => done(err)
-      )
+        done(null, user);
+      } catch (err) {
+        done(err);
+      }
     }
   )
 );
@@ -102,7 +95,7 @@ module.exports = function (app) {
   app.get(
     "/api/auth/renew/:refreshToken",
     async function (req, res) {
-      try{
+      try {
         let oldToken = await RefreshToken.findOne({where: {token: req.params.refreshToken}})
         if (oldToken === null || oldToken === undefined) {
           return res.status(400).send("Invalid token")
@@ -121,7 +114,7 @@ module.exports = function (app) {
           accessToken,
           refreshToken
         });
-      }catch (e) {
+      } catch (e) {
         res.status(500).send("Internal error")
       }
     }

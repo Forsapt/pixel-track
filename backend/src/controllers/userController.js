@@ -3,26 +3,22 @@ const router = express.Router();
 const {privateRoute} = require("../middleware");
 const {userService} = require('../services')
 
-router.get("/", privateRoute, (req, res, next) => {
-  userService.getUserById(req.user.id)
-    .then(
-      user => res.json(user)
-    )
-    .catch(
-      err => res.status(400).send(err.message)
-    )
+router.get("/", privateRoute, async (req, res, next) => {
+  try {
+    let user = await userService.getUserById(req.user.id)
+    res.json(user);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
 });
 
-router.put("/", privateRoute, (req, res, next) => {
-  userService.updateUser(req.user.id, req.body)
-    .then(
-      user => {
-        res.json(user)
-      }
-    )
-    .catch(
-      err => res.status(400).send(err.message)
-    )
+router.put("/", privateRoute, async (req, res, next) => {
+  try{
+    let user = await userService.updateUser(req.user.id, req.body)
+    res.json(user)
+  }catch (err) {
+    res.status(400).send(err.message)
+  }
 });
 
 module.exports = router;
